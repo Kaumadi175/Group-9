@@ -67,3 +67,10 @@ growth_data <- read.csv("growth_data.csv")
 colnames(growth_data)
 ```
 
+Q7.
+#Check the circumference columns are numeric and if not, convert them
+
+```{r}
+growth_data$Circumf_2005_cm <- as.numeric(gsub("[^0-9.]","",growth_data$Circumf_2005_cm))
+growth_data$Circumf_2020_cm <- as.numeric(gsub("[^0-9,]","",growth_data$Circumf_2020_cm))
+```
