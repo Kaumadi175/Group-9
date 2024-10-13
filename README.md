@@ -204,3 +204,139 @@ median(len)
 ```{r}
 boxplot(len,ylab="sequence length (bp)")
 ```
+#Sequence composition
+```{r}
+GC(cds[[1]])
+```
+[1] 0.5151515
+
+#number of each nucleotide present in E coli
+```{r}
+count(cds[[1]],1)
+count(cds[[1]],2)
+count(cds[[1]],3)
+```
+#Unlist first three sequences from the cds list
+```{r}
+length(unlist(cds[1:3]))
+```
+```{r}
+GC(unlist(cds[1:3]))
+```
+
+#bar plots for nucleotide in E coli
+```{r}
+dna <- unlist(cds)
+dna_composition <- count(dna,1)
+```
+
+```{r}
+barplot(dna_composition,xlab="nucleotides",ylab="frequency", main="E coli CDS composition")
+```
+
+```{r}
+translate(cds[[1]])
+prot <- lapply(cds, translate)
+```
+
+```{r}
+aa <- unique(prot[[2]])
+aa <- aa[aa != "*"]
+length(aa)
+```
+
+```{r}
+count(prot[[1]],wordsize=1,alphabet=aa)
+count(prot[[2]],wordsize=1,alphabet=aa)
+```
+
+#bar plots for amino acids in E coli
+```{r}
+aminoacids <- unlist(cds)
+aminoacids_composition <- count(aminoacids,1)
+barplot(aminoacids_composition,xlab="aminoacids",ylab="frequency", main="E coli CDS composition")
+```
+
+#codon usage for a single protein sequence
+```{r}
+uco(cds[[2]])
+
+uco(cds[[2]],index="rscu")
+
+uco(cds[[2]],index="rscu",as.data.frame=TRUE)
+```
+
+#Sequences over- or under-represented in an Ecoli
+```{r}
+prots <- unlist(prot)
+
+mycounts <- count(prots,wordsize=3,alphabet=aa)
+
+str(mycounts)
+
+head(mycounts)
+
+myfreq <- count(prots,wordsize=3,alphabet=aa,freq=TRUE)
+```
+
+
+
+#Cryobacterium sp organism 
+```{r}
+cds <- seqinr::read.fasta("Cryobacterium_cds.fa")
+str(head(cds))
+
+length(cds)
+
+head(summary(cds))
+len <- as.numeric(summary(cds)[,1])
+sum(len)
+mean(len)
+median(len)
+boxplot(len,ylab="sequence length (bp)")
+
+GC(cds[[1]])
+
+count(cds[[1]],1)
+
+count(cds[[1]],2)
+
+count(cds[[1]],3)
+
+length(unlist(cds[1:3]))
+
+dna <- unlist(cds)
+
+dna_composition <- count(dna,1)
+barplot(dna_composition,xlab="nucleotides",ylab="frequency", main="Cryobacterium CDS composition")
+
+translate(cds[[1]])
+prot <- lapply(cds, translate)
+
+aa <- unique(prot[[2]])
+aa <- aa[aa != "*"]
+length(aa)
+
+count(prot[[1]],wordsize=1,alphabet=aa)
+
+count(prot[[2]],wordsize=1,alphabet=aa)
+
+aminoacids <- unlist(cds)
+aminoacids_composition <- count(aminoacids,1)
+barplot(aminoacids_composition,xlab="aminoacids",ylab="frequency", main="Cryobacterium CDS composition")
+
+uco(cds[[2]])
+
+uco(cds[[2]],index="rscu")
+
+uco(cds[[2]],index="rscu",as.data.frame=TRUE)
+
+prots <- unlist(prot)
+mycounts <- count(prots,wordsize=3,alphabet=aa)
+
+str(mycounts)
+
+head(mycounts)
+
+myfreq <- count(prots,wordsize=3,alphabet=aa,freq=TRUE)
+```
