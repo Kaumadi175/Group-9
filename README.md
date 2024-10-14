@@ -62,74 +62,91 @@ colnames(growth_data)
 ```
 
 Q7.
-#Check the circumference columns are numeric and if not, convert them
-
+#Load the data
 ```{r}
-growth_data$Circumf_2005_cm <- as.numeric(gsub("[^0-9.]","",growth_data$Circumf_2005_cm))
-growth_data$Circumf_2020_cm <- as.numeric(gsub("[^0-9,]","",growth_data$Circumf_2020_cm))
-```
-#Subset data by site
-```{r}
-control_site <- subset(growth_data, Site == "northeast")
-treatment_site <- subset(growth_data, Site == "southwest")
+url <- "https://raw.githubusercontent.com/ghazkha/Assessment4/refs/heads/main/growth_data.csv"
+growth_data <- read.csv(url, header = TRUE, stringsAsFactors = FALSE)
 ```
 
-#Calculating mean and standard deviation for each site and year
-#Display the summary table
-
+#Convert circumference columns to numeric
 ```{r}
-stats <- data.frame(
-  Site = c("Control", "Control", "Treatment", "Treatment"),
-  Year = c("2005", "2020", "2005", "2020"),
-  Mean = c(mean(control_site$Circumf_2005_cm, na.rm = TRUE),
-           mean(control_site$Circumf_2020_cm, na.rm = TRUE),
-           mean(treatment_site$Circumf_2005_cm, na.rm = TRUE),
-           mean(treatment_site$Circumf_2020_cm, na.rm = TRUE)),
-  SD = c(sd(control_site$Circumf_2005_cm, na.rm = TRUE),
-         sd(control_site$Circumf_2020_cm, na.rm = TRUE),
-         sd(treatment_site$Circumf_2005_cm, na.rm = TRUE),
-         sd(treatment_site$Circumf_2020_cm, na.rm = TRUE))
-)
-print(stats)
+growth_data$Circumf_2005_cm <- as.numeric(growth_data$Circumf_2005_cm)
+growth_data$Circumf_2020_cm <- as.numeric(growth_data$Circumf_2020_cm)
 ```
 
-#Includes in variable (growth_data)
+#Split the data by northeast site and southwest site
 ```{r}
-growth_data
+northeast_data <- subset(growth_data, Site == "northeast")
+southwest_data <- subset(growth_data, Site == "southwest")
 ```
+
+#Calculate mean and standard deviation for 2005 and 2020 circumference at northeast site
+```{r}
+northeast_2005_mean <- mean(northeast_data$Circumf_2005_cm, na.rm = TRUE)
+northeast_2005_sd <- sd(northeast_data$Circumf_2005_cm, na.rm = TRUE)
+northeast_2020_mean <- mean(northeast_data$Circumf_2020_cm, na.rm = TRUE)
+northeast_2020_sd <- sd(northeast_data$Circumf_2020_cm, na.rm = TRUE)
+```
+
+#Calculate mean and standard deviation for 2005 and 2020 circumference at southwest site
+```{r}
+southwest_2005_mean <- mean(southwest_data$Circumf_2005_cm, na.rm = TRUE)
+southwest_2005_sd <- sd(southwest_data$Circumf_2005_cm, na.rm = TRUE)
+southwest_2020_mean <- mean(southwest_data$Circumf_2020_cm, na.rm = TRUE)
+southwest_2020_sd <- sd(southwest_data$Circumf_2020_cm, na.rm = TRUE)
+```
+
+#Display the results
+```{r}
+cat("northeast Site:\n")
+cat("2005 - Mean:", northeast_2005_mean, ", SD:", northeast_2005_sd, "\n")
+cat("2020 - Mean:", northeast_2020_mean, ", SD:", northeast_2020_sd, "\n\n")
+
+cat("southwest Site:\n")
+cat("2005 - Mean:", southwest_2005_mean, ", SD:", southwest_2005_sd, "\n")
+cat("2020 - Mean:", southwest_2020_mean, ", SD:", southwest_2020_sd, "\n")
+```
+
 
 Q8.
-Made box plot of tree circumference at the start and end of the study at control and treatment site.
-#Create the boxplot
-
+#Combine data into a single vector for plotting
 ```{r}
-boxplot(Circumference ~ Site * Time, data = growth_data_long, main = "Tree Circumference at Start and End of Study by Site", xlab = "Site and Time", ylab = "Circumference (cm)", col = c("lightblue", "lightgreen"), las = 2, # Makes x-axis labels vertical 
-names = c("Control\nStart (2005)", "Control\nEnd (2020)", "Treatment\nStart (2005)", "Treatment\nEnd (2020)"))
+combined_data <- list(
+  "2005" = growth_data$Circumf_2005_cm[growth_data$Site == "northeast"],
+  "2020" = growth_data$Circumf_2020_cm[growth_data$Site == "northeast"],
+  "2005_Treatment" = growth_data$Circumf_2005_cm[growth_data$Site == "southwest"],
+  "2020_Treatment" = growth_data$Circumf_2020_cm[growth_data$Site == "southwest"]
+)
 ```
 
 Q9.
-#Ensure the circumference columns are numeric
-
+#Calculate growth over the last 10 years
 ```{r}
-growth_data$Circumf_2010_cm <- as.numeric(growth_data$Circumf_2010_cm)
-growth_data$Circumf_2020_cm <- as.numeric(growth_data$Circumf_2020_cm)
+growth_data$Growth <- growth_data$Circumf_2020_cm - growth_data$Circumf_2010_cm
 ```
-#Calculated the growth over the last 10 years (2020-2010)
+#Calculate mean growth for each site and display the results
 ```{r}
-growth_data$Growth_10yrs <- growth_data$Circumf_2020_cm - growth_data$Circumf_2010_cm
-```
-#Calculated the mean growth at each site and display the result
-```{r}
-mean_growth <- aggregate(Growth_10yrs ~ Site, data = growth_data, FUN = mean, na.rm = TRUE)
+mean_growth <- aggregate(Growth ~ Site, data = growth_data, FUN = mean, na.rm = TRUE)
 print(mean_growth)
 ```
 
+
 Q10.
-#Perform a two sample t-test to compare growth between sites and display the t-test result
+#Calculate growth over the last 10 years
 ```{r}
-t_test_result <- t.test(Growth_10yrs ~ Site, data = growth_data)
+growth_data$Growth <- growth_data$Circumf_2020_cm - growth_data$Circumf_2010_cm
+```
+#Split growth data by site
+```{r}
+northeast_growth <- growth_data$Growth[growth_data$Site == "northeast"]
+southwest_growth <- growth_data$Growth[growth_data$Site == "southwest"]
+```
+#Perform the t-test and display the t-test results
+```{r}
+t_test_result <- t.test(northeast_growth, southwest_growth, var.equal = TRUE)
 print(t_test_result)
 ```
+
 
 Assignment 4_Part2
 
